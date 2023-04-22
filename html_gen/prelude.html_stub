@@ -1,0 +1,17 @@
+<hmtl>
+<canvas id="the_canvas" width="1920" height="1080"></canvas>
+<style>
+* {
+   margin: 0;
+   padding: 0;
+}
+body, html {
+   height:100%;
+}
+#canvas {
+   position:absolute;
+   height:100%; width:100%;
+}
+</style>
+<script>
+const wasmBytes = [

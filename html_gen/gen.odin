@@ -7,7 +7,7 @@ import c "core:c/libc"
 main :: proc() {
     using fmt
 
-    println(#load("prelude.html", string))
+    println(#load("prelude.html_stub", string))
 
     // odin's fmt flushes stdout each time or something idk c.printf is just faster bro
     for b in #load("../orrery.wasm") {
@@ -15,5 +15,5 @@ main :: proc() {
     }
     c.fflush(c.stdout)
     
-    println(#load("footer.html", string))
+    println(#load("footer.html_stub", string))
 }

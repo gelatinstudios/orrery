@@ -1,0 +1,136 @@
+];
+
+(function() {
+
+function getElement(name) {
+	if (name) {
+		return document.getElementById(name);
+	}
+	return undefined;
+}
+
+class WasmMemoryInterface {
+	constructor() {
+		this.memory = null;
+		this.exports = null;
+		this.listenerMap = {};
+	}
+
+	setMemory(memory) {
+		this.memory = memory;
+	}
+
+	setExports(exports) {
+		this.exports = exports;
+	}
+
+	get mem() {
+		return new DataView(this.memory.buffer);
+	}
+
+};
+
+function odinSetupDefaultImports(wasmMemoryInterface, consoleElement) {
+	return {
+		"env": {},
+		"odin_env": {
+			write: (fd, ptr, len) => {
+				const str = wasmMemoryInterface.loadString(ptr, len);
+				if (fd == 1) {
+					writeToConsole(str, false);
+					return;
+				} else if (fd == 2) {
+					writeToConsole(str, true);
+					return;
+				} else {
+					throw new Error("Invalid fd to 'write'" + stripNewline(str));
+				}
+			},
+			trap: () => { throw new Error() },
+			alert: (ptr, len) => { alert(wasmMemoryInterface.loadString(ptr, len)) },
+			abort: () => { Module.abort() },
+			evaluate: (str_ptr, str_len) => { eval.call(null, wasmMemoryInterface.loadString(str_ptr, str_len)); },
+
+			time_now: () => {
+				// convert ms to ns
+				
+				return BigInt(Date.now() * 1e6);
+			},
+			tick_now: () => {
+				// convert ms to ns
+				return performance.now() * 1e6;
+			},
+			time_sleep: (duration_ms) => {
+				if (duration_ms > 0) {
+					// TODO(bill): Does this even make any sense?
+				}
+			},
+
+			sqrt:    (x) => Math.sqrt(x),
+			sin:     (x) => Math.sin(x),
+			cos:     (x) => Math.cos(x),
+			pow:     (x, power) => Math.pow(x, power),
+			fmuladd: (x, y, z) => x*y + z,
+			ln:      (x) => Math.log(x),
+			exp:     (x) => Math.exp(x),
+			ldexp:   (x) => Math.ldexp(x),
+		},
+	};
+};
+
+async function runWasm(wasmBytes, consoleElement, extraForeignImports) {
+	let wasmMemoryInterface = new WasmMemoryInterface();
+
+	let imports = odinSetupDefaultImports(wasmMemoryInterface, consoleElement);
+	let exports = {};
+
+	if (extraForeignImports !== undefined) {
+		imports = {
+			...imports,
+			...extraForeignImports,
+		};
+	}
+
+	const wasm = await WebAssembly.instantiate((new Uint8Array(wasmBytes)).buffer, imports);
+	exports = wasm.instance.exports;
+	wasmMemoryInterface.setExports(exports);
+	wasmMemoryInterface.setMemory(exports.memory);
+
+	return exports;
+};
+
+window.odin = {
+	// Interface Types
+	WasmMemoryInterface: WasmMemoryInterface,
+
+	// Functions
+	setupDefaultImports: odinSetupDefaultImports,
+	runWasm:             runWasm,
+};
+})();
+
+odin.runWasm((new Uint8Array(wasmBytes)).buffer, console).then((exports)=>{
+	const w = 1920;
+	const h = 1080;
+
+	const image_offset = exports.image_memory_buffer_ptr();
+	exports._start()
+
+	const star_seed = BigInt(Date.now() * 1e6);
+
+	var canvas = document.getElementById("the_canvas");
+	var ctx = canvas.getContext('2d');
+
+	function draw(timestamp) {
+		exports.make_orrery(image_offset, w, h, star_seed);
+		const image_slice = exports.memory.buffer.slice(image_offset, image_offset + w * h * 4);
+		const pixels = new Uint8ClampedArray(image_slice);
+		const image_data = new ImageData(pixels,w,h);
+		ctx.putImageData(image_data, 0, 0);
+		window.requestAnimationFrame(draw);
+	}
+	window.requestAnimationFrame(draw);
+});
+
+</script>
+</html>
