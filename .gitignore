@@ -1,0 +1,6 @@
+*.exe
+*.html
+*.pdb
+*.wasm
+*.png
+.vs/*
