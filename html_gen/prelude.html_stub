@@ -4,6 +4,7 @@
 * {
    margin: 0;
    padding: 0;
+   background-color: #010707;
 }
 body, html {
    height:100%;
