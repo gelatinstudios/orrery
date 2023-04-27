@@ -118,18 +118,19 @@ odin.runWasm((new Uint8Array(wasmBytes)).buffer, console).then((exports)=>{
 
 	const star_seed = BigInt(Date.now() * 1e6);
 
+	exports.make_orrery(image_offset, w, h, star_seed);
+	const image_slice = exports.memory.buffer.slice(image_offset, image_offset + w * h * 4);
+	const pixels = new Uint8ClampedArray(image_slice);
+	const image_data = new ImageData(pixels,w,h);
+
 	var canvas = document.getElementById("the_canvas");
 	var ctx = canvas.getContext('2d');
 
-	function draw(timestamp) {
-		exports.make_orrery(image_offset, w, h, star_seed);
-		const image_slice = exports.memory.buffer.slice(image_offset, image_offset + w * h * 4);
-		const pixels = new Uint8ClampedArray(image_slice);
-		const image_data = new ImageData(pixels,w,h);
+	//function draw(timestamp) {
 		ctx.putImageData(image_data, 0, 0);
-		window.requestAnimationFrame(draw);
-	}
-	window.requestAnimationFrame(draw);
+		//window.requestAnimationFrame(draw);
+	//}
+	//window.requestAnimationFrame(draw);
 });
 
 </script>
