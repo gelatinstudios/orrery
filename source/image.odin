@@ -219,6 +219,22 @@ ch :: proc(c: rune) -> rune {
 draw_text :: proc(im: Image, x, y: f32, text: string) {
     x := x
     y := y
+
+    // fuck stars - make text readable
+    // this code is rushed and sloppy!!
+    padding :: 10
+    /* for ypos in int(y) - padding - TEXT_HEIGHT ..< int(y) + padding { */
+    /* 	for xpos in int(x) - padding ..< int (x) + len(text)*int(math.ceil_f32(font.ADVANCE_X)) + padding { */
+    /* 	    index := xpos + ypos*int(im.width) */
+    /* 	    im.pixels[index] = BACKGROUND_COLOR */
+    /* 	} */
+    /* } */
+    for ypos in int(y - (TEXT_HEIGHT/2)) ..< int(y) + (TEXT_HEIGHT)/2 {
+	for xpos in int(x) - padding ..< int (x) + int(math.ceil_f32(f32(len(text))*font.ADVANCE_X)) + padding {
+	    index := xpos + ypos*int(im.width)
+	    im.pixels[index] = BACKGROUND_COLOR
+	}
+    }
     
     for character, i in text {
         c := ch(character)
@@ -274,6 +290,10 @@ draw_text :: proc(im: Image, x, y: f32, text: string) {
                 dest_index := x + y*im.width
                 
                 prev_color := im.pixels[dest_index]
+
+		// fuck stars - let's make the text readable!!
+		// prev_color = BACKGROUND_COLOR
+		
                 color := u32(alpha) << 24 | (TEXT_COLOR & 0xffffff)
 
                 prev_v := pixel_to_v4(prev_color)

@@ -24,9 +24,11 @@ to_pixel :: proc($color: u32) -> u32 {
 }
 
 BACKGROUND_COLOR := to_pixel(0x010707)
-STAR_COLOR       := to_pixel(0x284244)
+STAR_COLOR       := to_pixel(0xBAF2F5)
 TEXT_COLOR       := to_pixel(0xd1f7f9)
-CIRCLE_COLOR     := to_pixel(0x052323)
+//CIRCLE_COLOR     := to_pixel(0x052323)
+
+CIRCLE_COLOR := to_pixel(0x1BC2CB)
 
 MAKE_STARS :: true
 
