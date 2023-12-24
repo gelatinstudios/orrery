@@ -40,7 +40,7 @@ v4_to_pixel :: proc(v: v4) -> u32 {
 
 make_background :: proc(width, height: i32) -> Image {
     result := Image {
-        pixels = make([]u32, width*height)
+        pixels = make([]u32, width*height),
         width = width,
         height = height,
     }

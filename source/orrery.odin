@@ -336,7 +336,7 @@ make_orrery :: proc "c" (pixels: [^]u32, width, height: i32, star_seed: u64) {
 
         for position, i in positions[:planet_count] {
             bodies[i+1] = Body {
-                id = Body_ID(i + int(Body_ID.Mercury))
+                id = Body_ID(i + int(Body_ID.Mercury)),
                 image = planet_images[i],
                 position = position,
             }
@@ -366,7 +366,7 @@ make_orrery :: proc "c" (pixels: [^]u32, width, height: i32, star_seed: u64) {
         for position, i in positions {
             g := to_geocentric_position(position, earth_pos)
             bodies[i] = Body {
-                id = Body_ID(i + int(Body_ID.Mercury))
+                id = Body_ID(i + int(Body_ID.Mercury)),
                 image = planet_images[i],
                 position = g
             }
