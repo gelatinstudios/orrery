@@ -1,2 +1,2 @@
 
-odin build source/os -out:orrery.exe -o:speed
+odin build source/os -out:orrery -o:speed
